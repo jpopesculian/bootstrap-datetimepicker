@@ -2324,6 +2324,7 @@
             }
 
             viewDate = parseInputDate(newDate);
+            update();
             viewUpdate();
             return picker;
         };
