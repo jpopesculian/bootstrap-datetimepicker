@@ -2357,7 +2357,12 @@
 
         // Set defaults for date here now instead of in var declaration
         date = getMoment();
-        viewDate = (options.viewDate && options.viewDate.clone()) || date.clone();
+        if (options.viewDate) {
+            viewDate = getMoment(options.viewDate);
+            date = viewDate.clone();
+        } else {
+            viewDate = date.clone();
+        }
 
         picker.options(options);
 
