@@ -816,13 +816,16 @@
             },
 
             fillTime = function () {
-                var toggle, newDate, timeComponents = widget.find('.timepicker span[data-time-component]');
+                var currentDate = viewDate.clone(),
+                    toggle,
+                    newDate,
+                    timeComponents = widget.find('.timepicker span[data-time-component]');
 
                 if (!use24Hours) {
                     toggle = widget.find('.timepicker [data-action=togglePeriod]');
-                    newDate = date.clone().add((date.hours() >= 12) ? -12 : 12, 'h');
+                    newDate = currentDate.clone().add((currentDate.hours() >= 12) ? -12 : 12, 'h');
 
-                    toggle.text(date.format('A'));
+                    toggle.text(currentDate.format('A'));
 
                     if (isValid(newDate, 'h')) {
                         toggle.removeClass('disabled');
@@ -830,9 +833,9 @@
                         toggle.addClass('disabled');
                     }
                 }
-                timeComponents.filter('[data-time-component=hours]').text(date.format(use24Hours ? 'HH' : 'hh'));
-                timeComponents.filter('[data-time-component=minutes]').text(date.format('mm'));
-                timeComponents.filter('[data-time-component=seconds]').text(date.format('ss'));
+                timeComponents.filter('[data-time-component=hours]').text(currentDate.format(use24Hours ? 'HH' : 'hh'));
+                timeComponents.filter('[data-time-component=minutes]').text(currentDate.format('mm'));
+                timeComponents.filter('[data-time-component=seconds]').text(currentDate.format('ss'));
 
                 fillHours();
                 fillMinutes();
@@ -880,7 +883,7 @@
 
                 if (isValid(targetMoment)) {
                     date = targetMoment;
-                    //viewDate = date.clone(); // TODO this doesn't work right on first use
+                    viewDate = date.clone();
                     input.val(date.format(actualFormat));
                     element.data('date', date.format(actualFormat));
                     unset = false;
@@ -946,8 +949,6 @@
                 });
 
                 input.blur();
-
-                viewDate = date.clone();
 
                 return picker;
             },
@@ -2352,11 +2353,11 @@
             throw new Error('Could not initialize DateTimePicker without an input element');
         }
 
+        $.extend(true, options, dataToOptions());
+
         // Set defaults for date here now instead of in var declaration
         date = getMoment();
-        viewDate = date.clone();
-
-        $.extend(true, options, dataToOptions());
+        viewDate = (options.viewDate && options.viewDate.clone()) || date.clone();
 
         picker.options(options);
 
