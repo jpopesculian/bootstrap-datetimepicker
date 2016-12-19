@@ -741,11 +741,12 @@
                     if (currentDate.day() === 0 || currentDate.day() === 6) {
                         clsNames.push('weekend');
                     }
-                    notifyEvent({
-                        type: 'dp.classify',
-                        date: currentDate,
-                        classNames: clsNames
-                    });
+                    // removed for efficiency
+                    // notifyEvent({
+                    //     type: 'dp.classify',
+                    //     date: currentDate,
+                    //     classNames: clsNames
+                    // });
                     row.append('<td data-action="selectDay" data-day="' + currentDate.format('L') + '" class="' + clsNames.join(' ') + '">' + currentDate.date() + '</td>');
                     currentDate.add(1, 'd');
                 }
