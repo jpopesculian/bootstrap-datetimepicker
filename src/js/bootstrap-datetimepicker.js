@@ -403,7 +403,7 @@
             },
 
             place = function () {
-                var position = (component || element).position(),
+                var PADDING = 3,
                     offset = (component || element).offset(),
                     vertical = options.widgetPositioning.vertical,
                     horizontal = options.widgetPositioning.horizontal,
@@ -464,12 +464,17 @@
                     throw new Error('datetimepicker component should be placed within a non-static positioned container');
                 }
 
-                widget.css({
-                    top: vertical === 'top' ? 'auto' : position.top + element.outerHeight(),
-                    bottom: vertical === 'top' ? parent.outerHeight() - (parent === element ? 0 : position.top) : 'auto',
-                    left: horizontal === 'left' ? (parent === element ? 0 : position.left) : 'auto',
-                    right: horizontal === 'left' ? 'auto' : parent.outerWidth() - element.outerWidth() - (parent === element ? 0 : position.left)
+                widget.position({
+                    my: horizontal + ' ' + (vertical === 'top' ? 'bottom-' + PADDING : 'top+' + PADDING),
+                    at: horizontal + ' ' + vertical,
+                    of: element
                 });
+            },
+
+            linkWidgetAndElement = function () {
+                var randomId = Math.round((Math.random() + Date.now()) * 1000);
+                widget.attr('data-datetimepicker-id', randomId);
+                element.attr('data-datetimepicker-id', randomId);
             },
 
             notifyEvent = function (e) {
@@ -1233,6 +1238,7 @@
                     setValue(currentMoment);
                 }
                 widget = getTemplate();
+                linkWidgetAndElement();
 
                 fillDow();
                 fillMonths();
@@ -1251,8 +1257,8 @@
                 if (component && component.hasClass('btn')) {
                     component.toggleClass('active');
                 }
-                place();
                 widget.show();
+                place();
                 if (options.focusOnShow && !input.is(':focus')) {
                     input.focus();
                 }
