@@ -1,4 +1,4 @@
-/*! version : 4.17.46
+/*! version : 4.17.47
  =========================================================
  bootstrap-datetimejs
  https://github.com/Eonasdan/bootstrap-datetimepicker
@@ -453,15 +453,15 @@
                     widget.removeClass('pull-right');
                 }
 
-                // find the first parent element that has a relative css positioning
-                if (parent.css('position') !== 'relative') {
+                // find the first parent element that has a non-static css positioning
+                if (parent.css('position') === 'static') {
                     parent = parent.parents().filter(function () {
-                        return $(this).css('position') === 'relative';
+                        return $(this).css('position') !== 'static';
                     }).first();
                 }
 
                 if (parent.length === 0) {
-                    throw new Error('datetimepicker component should be placed within a relative positioned container');
+                    throw new Error('datetimepicker component should be placed within a non-static positioned container');
                 }
 
                 widget.css({
@@ -960,7 +960,7 @@
 
             parseInputDate = function (inputDate) {
                 if (options.parseInputDate === undefined) {
-                    if (!moment.isMoment(inputDate)) {
+                    if (!moment.isMoment(inputDate) || inputDate instanceof Date) {
                         inputDate = getMoment(inputDate);
                     }
                 } else {
@@ -1430,7 +1430,10 @@
                 if (!unset) {
                     setValue(date);
                 }
-            };
+            },
+            //variables for setInlineView
+            setInlineViewCache,
+            elems;
 
         /********************************************************************************
          *
@@ -2330,6 +2333,29 @@
             return picker;
         };
 
+        /**
+         * Sets the view in inline mode
+         * @param {Takes string, 'datepicker', 'timepicker'} newDate
+         * @returns {picker instance}
+         */
+        picker.setInlineView = function (view) {
+            if (picker.options().inline) {
+                var cache = picker.setInlineView.cache;
+                if (view === 'datepicker') {
+                    //show the date picker
+                    cache.firstLi.collapse('show');
+                    cache.lastLi.collapse('hide');
+                    cache.span.removeClass('glyphicon-calendar').addClass('glyphicon-time');
+                } else if (view === 'timepicker') {
+                    //show the time picker
+                    cache.firstLi.collapse('hide');
+                    cache.lastLi.collapse('show');
+                    cache.span.removeClass('glyphicon-time').addClass('glyphicon-calendar');
+                }
+            }
+            return picker;
+        };
+
         // initializing element and component attributes
         if (element.is('input')) {
             input = element;
@@ -2383,6 +2409,13 @@
         }
         if (options.inline) {
             show();
+            elems = $('li', widget);
+            setInlineViewCache = {
+                firstLi : elems.first(),
+                span: elems.first().next().find('span'),
+                lastLi : elems.last()
+            };
+            picker.setInlineView.cache = setInlineViewCache;
         }
         return picker;
     };
